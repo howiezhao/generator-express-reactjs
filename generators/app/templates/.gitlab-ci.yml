@@ -1,0 +1,45 @@
+image: docker:19.03.8
+
+variables:
+  # Enable the docker TLS, ref: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
+  DOCKER_TLS_CERTDIR: "/certs"
+  # Use the OverlayFS driver, ref: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-the-overlayfs-driver
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:19.03.8-dind
+
+before_script:
+  - docker info
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+stages:
+  - lint
+  - test
+  - deploy
+  - docs
+
+eslint:
+  stage: lint
+  script:
+    - echo "lint"
+
+mocha:
+  stage: test
+  script:
+    - echo "test"
+
+aws:
+  stage: deploy
+  when: manual
+  script:
+    - echo "deploy"
+
+pages:
+  stage: docs
+  when: manual
+  script:
+    - echo "docs"
+  artifacts:
+    paths:
+      - public
